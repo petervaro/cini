@@ -1,0 +1,14 @@
+CINI -- C Project Initialization
+================================
+
+1. Install:
+
+    $ git clone https://github.com/petervaro/cini.git
+    $ cd cini
+    $ sudo cp cini.sh /usr/local/bin/cini
+
+2. Usage:
+
+    $ cd path/to/parent/folder/of/project
+    $ cini my-project
+    $ cd my-project
