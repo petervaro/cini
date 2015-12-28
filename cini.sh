@@ -42,11 +42,12 @@ build-*
 README.html
 ";
 step=1;
+total=1;
 
 stepper()
 {
-    printf "\033[1;35m[\033[1;36m$((step++))\033[0;35m/\033[0;36m8\033[1;35m]";
-    printf "$count \033[1;37m$1\n\033[0m";
+    printf "\033[1;35m[\033[1;36m$((step++))\033[0;35m/\033[0;36m$total\033[1;35m]";
+    printf "\033[1;37m$1\033[0m\n";
 }
 
 if [ -z "$1" ];
@@ -55,10 +56,16 @@ then
     exit 1;
 fi;
 
-# Create project folder
-stepper "Create project folder: $1";
-mkdir $1;
-cd $1;
+if [ "$1" != "." ];
+then
+    total=8;
+    # Create project folder
+    stepper "Create project folder: $1";
+    mkdir $1;
+    cd $1;
+else
+    total=7;
+fi;
 
 # Add README and LICENSE files
 stepper "Create file: README.md";
