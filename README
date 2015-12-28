@@ -9,6 +9,11 @@ CINI -- C Project Initialization
 
 2. Usage:
 
+    # Create new project folder and initialize it
     $ cd path/to/parent/folder/of/project
     $ cini my-project
     $ cd my-project
+
+    # Initialize an existing project folder
+    $ cd path/to/the/project
+    $ cini .
