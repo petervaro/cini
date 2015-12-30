@@ -41,12 +41,18 @@ build-*
 # Files
 README.html
 ";
+gitattributes="\
+*.c   linguist-language=C
+*.h   linguist-language=C
+*.cpp linguist-language=C++
+*.hpp linguist-language=C++
+";
 step=1;
 total=1;
 
 stepper()
 {
-    printf "\033[1;35m[\033[1;36m$((step++))\033[0;35m/\033[0;36m$total\033[1;35m]";
+    printf "\033[1;35m[\033[1;36m$((step++))\033[0;35m/\033[0;36m$total\033[1;35m] ";
     printf "\033[1;37m$1\033[0m\n";
 }
 
@@ -86,7 +92,8 @@ printf "$main_c" > src/main.c;
 stepper "Create git repository";
 git init;
 printf "$gitignore" > .gitignore;
-git add .gitignore;
+printf "$gitattributes" > .gitattributes
+git add .gitignore .gitattributes;
 
 # Add tup support
 stepper "Setup git submodule: tuplet";
