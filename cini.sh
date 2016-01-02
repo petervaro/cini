@@ -64,13 +64,13 @@ fi;
 
 if [ "$1" != "." ];
 then
-    total=8;
+    total=9;
     # Create project folder
     stepper "Create project folder: $1";
     mkdir $1;
     cd $1;
 else
-    total=7;
+    total=8;
 fi;
 
 # Add README and LICENSE files
@@ -103,5 +103,11 @@ bash tuplet/setup.sh;
 # Initialize tup
 stepper "Create tup repository";
 tup init;
+
+# Add mininstall support
+stepper "Setup git submodule: tuplet";
+git submodule add https://github.com/petervaro/mininstall.git;
+cp mininstall/install.sh .;
+chmod +x install.sh;
 
 exit;
