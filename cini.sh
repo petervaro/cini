@@ -37,9 +37,6 @@ build-*
 
 # Hidden folders
 .tup
-
-# Files
-README.html
 ";
 gitattributes="\
 *.c   linguist-language=C
@@ -47,67 +44,148 @@ gitattributes="\
 *.cpp linguist-language=C++
 *.hpp linguist-language=C++
 ";
-step=1;
-total=1;
 
+
+#------------------------------------------------------------------------------#
+counter()
+{
+    printf "$#";
+}
+
+
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
 stepper()
 {
-    printf "\033[1;35m[\033[1;36m$((step++))\033[0;35m/\033[0;36m$total\033[1;35m] ";
+    printf "\033[1;35m[\033[1;36m${INDEX}\033[0;35m/\033[0;36m${TOTAL}\033[1;35m] ";
     printf "\033[1;37m$1\033[0m\n";
 }
 
+
+#------------------------------------------------------------------------------#
+task_project()
+{
+    # Create project folder
+    stepper "Create project folder: ${FOLDER}";
+    mkdir ${FOLDER};
+    cd ${FOLDER};
+}
+
+
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
+task_README()
+{
+    # Create README file
+    stepper "Create file: README.md";
+    touch README.md;
+}
+
+
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
+task_LICENSE()
+{
+    # Download LICENSE file
+    stepper "Download file: LICENSE (GPLv3)";
+    wget http://www.gnu.org/licenses/gpl-3.0.txt -O LICENSE;
+}
+
+
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
+task_mkdirs()
+{
+    # Create basic folder hierarchy
+    stepper "Create folders: src include";
+    mkdir src;
+    mkdir include;
+}
+
+
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
+task_main_c()
+{
+    # Add simple file
+    stepper "Create file: src/main.c";
+    printf "$main_c" > src/main.c;
+}
+
+
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
+task_git()
+{
+    # Make this a git repository
+    stepper "Create git repository";
+    git init;
+    printf "$gitignore" > .gitignore;
+    printf "$gitattributes" > .gitattributes
+    git add .gitignore .gitattributes;
+}
+
+
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
+task_tuplet()
+{
+    # Add tup support
+    stepper "Setup git submodule: tuplet";
+    git submodule add https://github.com/petervaro/tuplet.git;
+    bash tuplet/setup.sh;
+}
+
+
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
+task_mininstall()
+{
+    # Add mininstall support
+    stepper "Setup git submodule: mininstall";
+    git submodule add https://github.com/petervaro/mininstall.git;
+    cp mininstall/install.sh .;
+    chmod +x install.sh;
+}
+
+
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - #
+task_tup()
+{
+    # Initialize tup
+    stepper "Create tup repository";
+    tup init;
+}
+
+
+#------------------------------------------------------------------------------#
+TASKS="
+task_README
+task_LICENSE
+task_mkdirs
+task_main_c
+task_git
+task_tuplet
+task_mininstall
+task_tup
+";
+
+
+#------------------------------------------------------------------------------#
+# If no project folder name specified
 if [ -z "$1" ];
 then
     printf "\033[1;31mYou have to specify the project (folder) name!\033[0m\n";
     exit 1;
 fi;
 
+# If project folder is not current folder
 if [ "$1" != "." ];
 then
-    total=9;
-    # Create project folder
-    stepper "Create project folder: $1";
-    mkdir $1;
-    cd $1;
-else
-    total=8;
+    TASKS="task_project $TASKS";
 fi;
 
-# Add README and LICENSE files
-stepper "Create file: README.md";
-touch README.md;
-stepper "Download file: LICENSE (GPLv3)";
-wget http://www.gnu.org/licenses/gpl-3.0.txt -O LICENSE;
+# Execute tasks one-by-one
+INDEX=1;
+TOTAL=`counter $TASKS`;
+FOLDER="$1";
+for task in $TASKS;
+do
+    eval "$task";
+    INDEX=$((INDEX+=1))
+done;
 
-# Create basic folder hierarchy
-stepper "Create folders: src include";
-mkdir src;
-mkdir include;
-
-# Add simple file
-stepper "Create file: src/main.c";
-printf "$main_c" > src/main.c;
-
-# Make this a git repository
-stepper "Create git repository";
-git init;
-printf "$gitignore" > .gitignore;
-printf "$gitattributes" > .gitattributes
-git add .gitignore .gitattributes;
-
-# Add tup support
-stepper "Setup git submodule: tuplet";
-git submodule add https://github.com/petervaro/tuplet.git;
-bash tuplet/setup.sh;
-
-# Initialize tup
-stepper "Create tup repository";
-tup init;
-
-# Add mininstall support
-stepper "Setup git submodule: tuplet";
-git submodule add https://github.com/petervaro/mininstall.git;
-cp mininstall/install.sh .;
-chmod +x install.sh;
-
+# Terminate script
 exit;
